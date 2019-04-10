@@ -1,0 +1,28 @@
+{
+  "name": "restapi",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lucasssg/RestApi.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/lucasssg/RestApi/issues"
+  },
+  "homepage": "https://github.com/lucasssg/RestApi#readme",
+  "devDependencies": {
+    "typescript": "^3.4.2"
+  },
+  "dependencies": {
+    "@types/express": "^4.16.1",
+    "body-parser": "^1.18.3",
+    "cors": "^2.8.5",
+    "express": "^4.16.4"
+  }
+}
