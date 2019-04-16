@@ -1,4 +1,5 @@
 import express = require("express");
+import Dao from './dao';
 var cors = require('cors');
 var bodyParser = require('body-parser');
 
@@ -15,43 +16,31 @@ app.listen(port, () => {
 });
 
 app.get('/tamanhos', function(req, res) {
-    res.send([
-        {
-            id:1,
-            name:"Pequeno",
-            quantidade_sabores:1
-        },
-        {
-            id:2,
-            name:"Médio",
-            quantidade_sabores:2
-        },
-        {   id:3,
-            name:"Grande",
-            quantidade_sabores:3
-        }]
-    );
+    res.send(Dao.getTamanhos());
+});
+
+app.get('/sabores/:id', function(req, res, next) {
+    res.send(Dao.getSabores(req.params.id));
 });
 
 app.get('/cidades', function(req, res) {
-    res.send([
-        {
-            id:1,
-            name:"Jaraguá do Sul",
-        },
-        {
-            id:2,
-            name:"Corupá",
-        },
-        {   id:3,
-            name:"Guaramirim"
-        }]
-    );
+    res.send(Dao.getCidades());
+});
+
+app.get('/bairros/:id', function(req, res) {
+    res.send(Dao.getBairros(req.params.id));
 });
 
 app.post('/logon', function(req, res){
-    var userName = req.body.user;
+
+    var userName = req.body.userName;
     var password = req.body.password;
-    console.log("User name = "+userName+", password is "+password);
-    res.end("yes");
-  });
+
+    if (userName === "luquinhas" && password === "1234") {
+         console.log("User:"+userName+", Password:"+password);
+         res.send({success : true, message: 'authentication succeeded' });
+    }
+    else { 
+        res.send({success : false, message: 'authentication failed'});
+    }
+});
