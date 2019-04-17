@@ -7,6 +7,7 @@ const express = require("express");
 const dao_1 = __importDefault(require("./dao"));
 var cors = require('cors');
 var bodyParser = require('body-parser');
+var dataUser = [];
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
@@ -30,11 +31,25 @@ app.get('/bairros/:id', function (req, res) {
 app.post('/logon', function (req, res) {
     var userName = req.body.userName;
     var password = req.body.password;
-    if (userName === "luquinhas" && password === "1234") {
-        console.log("User:" + userName + ", Password:" + password);
+    var isValid = false;
+    dataUser.map((user) => {
+        if (userName == user.userName && password == user.password) {
+            console.log("user--->", user);
+            isValid = true;
+        }
+    });
+    if (isValid) {
         res.send({ success: true, message: 'authentication succeeded' });
     }
     else {
         res.send({ success: false, message: 'authentication failed' });
     }
+});
+app.post('/create', function (req, res) {
+    var userName = req.body.userName;
+    var password = req.body.password;
+    let user = { userName: userName, password: password };
+    dataUser.push(user);
+    res.send(user);
+    console.log("DataUser:", dataUser);
 });
