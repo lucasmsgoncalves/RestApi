@@ -2,8 +2,6 @@ import {Get} from '../decorators';
 import {Action} from '../kernel/action';
 import {ActionType} from '../kernel/route-types';
 import {MySQLFactory} from '../mysql/mysql_factory';
-import {KernelUtils} from '../kernel/kernel-utils';
-import {VPUtils} from '../utils/vputils';
 
 export class TamanhosAction extends Action {
 

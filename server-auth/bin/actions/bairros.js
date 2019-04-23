@@ -26,66 +26,34 @@ var decorators_1 = require("../decorators");
 var action_1 = require("../kernel/action");
 var route_types_1 = require("../kernel/route-types");
 var kernel_utils_1 = require("../kernel/kernel-utils");
+var mysql_factory_1 = require("../mysql/mysql_factory");
 var BairrosAction = /** @class */ (function (_super) {
     __extends(BairrosAction, _super);
     function BairrosAction() {
         return _super !== null && _super.apply(this, arguments) || this;
     }
+    BairrosAction.prototype.generateSQL = function (cidade) {
+        return 'select bairros.name, bairros.taxa from bairros ' +
+            'inner join cidades on cidades.id = bairros.idCidade ' +
+            'where bairros.idCidade =' + cidade;
+    };
     BairrosAction.prototype.getBairros = function () {
-        var bairros = [];
-        var idcidade = this.req.params.idcidade;
-        new kernel_utils_1.KernelUtils().createExceptionApiError('1002', 'Cidade não informada', (idcidade == null || idcidade == undefined));
-        if (idcidade == 1) {
-            bairros.push({
-                name: "Centro",
-                value: 1.50
-            }, {
-                name: "Agua Verde",
-                value: 2.35
-            }, {
-                name: "Chico de Paula",
-                value: 3.80
-            }, {
-                name: "Figueira",
-                value: 4
-            });
-        }
-        if (idcidade == 2) {
-            bairros.push({
-                name: "Seminário",
-                value: 6.8
-            }, {
-                name: "Ano bom",
-                value: 6.75
-            }, {
-                name: "Centro",
-                value: 6
-            });
-        }
-        ;
-        if (idcidade == 3) {
-            bairros.push({
-                name: "Amizade",
-                value: 12
-            }, {
-                name: "Centro",
-                value: 8
-            }, {
-                name: "Avai",
-                value: 7
-            }, {
-                name: "Corticeira",
-                value: 7
-            });
-        }
-        ;
-        this.sendAnswer(bairros);
+        var _this = this;
+        var cidade = this.req.params.cidade;
+        new kernel_utils_1.KernelUtils().createExceptionApiError('1002', 'Cidade não informada', (cidade == null || cidade == undefined));
+        new mysql_factory_1.MySQLFactory().getConnection().select(this.generateSQL(cidade)).subscribe(function (data) {
+            console.log("data", data);
+            _this.sendAnswer(data);
+        }, function (error) {
+            console.log("ERRO", error);
+            _this.sendError(error);
+        });
     };
     BairrosAction.prototype.defineVisibility = function () {
         this.actionEscope = route_types_1.ActionType.atPublic;
     };
     __decorate([
-        decorators_1.Get('/bairros/:idcidade'),
+        decorators_1.Get('/bairros/:cidade'),
         __metadata("design:type", Function),
         __metadata("design:paramtypes", []),
         __metadata("design:returntype", void 0)

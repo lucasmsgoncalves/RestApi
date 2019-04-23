@@ -1,29 +1,25 @@
 import {Get} from '../decorators';
 import {Action} from '../kernel/action';
 import {ActionType} from '../kernel/route-types';
+import {MySQLFactory} from '../mysql/mysql_factory';
 
 export class CidadesAction extends Action {
 
+    private generateSQL() : string {
+        return 'select id, name from cidades';
+    }
+
     @Get('/cidades')
     public getCidades(){
-        let cidades : any = [];
+        new MySQLFactory().getConnection().select(this.generateSQL()).subscribe(
+            (data : any) => {
+                this.sendAnswer(data);
+            },
+            (error : any) => {
+                this.sendError(error);
 
-        cidades.push(
-                    {
-                        id : 1,
-                        name : "Jaraguá do Sul"
-                    },
-                    {
-                        id : 2,
-                        name : "Corupá"
-                    },
-                    {
-                        id : 3,
-                        name : "Guaramirim"
-                    }
-                   );
-
-        this.sendAnswer(cidades);
+            }
+        );
     }
 
     defineVisibility() {

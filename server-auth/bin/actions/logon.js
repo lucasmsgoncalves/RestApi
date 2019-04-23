@@ -41,10 +41,31 @@ var LogonAction = /** @class */ (function (_super) {
             + this.req.body.userName + '\' and users.password = \''
             + this.req.body.password + '\'';
     };
+    LogonAction.prototype.insertSQL = function () {
+        return 'INSERT INTO users (idUser, userName, password) ' +
+            'VALUES (3,' + this.req.body.userName + ',' + this.req.body.password + ')';
+    };
     LogonAction.prototype.Post = function () {
         var _this = this;
         this.validateData();
         new mysql_factory_1.MySQLFactory().getConnection().select(this.generateSQL()).subscribe(function (data) {
+            if (!data.length || data.length != 1) {
+                _this.sendError(new kernel_utils_1.KernelUtils().createErrorApiObject(401, '1001', 'Usuário e senha inválidos'));
+                return;
+            }
+            _this.sendAnswer({
+                token: new vputils_1.VPUtils().generateGUID().toUpperCase(),
+                userName: _this.req.body.userName,
+                password: _this.req.body.password
+            });
+        }, function (error) {
+            _this.sendError(error);
+        });
+    };
+    LogonAction.prototype.Insert = function () {
+        var _this = this;
+        this.validateData();
+        new mysql_factory_1.MySQLFactory().getConnection().select(this.insertSQL()).subscribe(function (data) {
             if (!data.length || data.length != 1) {
                 _this.sendError(new kernel_utils_1.KernelUtils().createErrorApiObject(401, '1001', 'Usuário e senha inválidos'));
                 return;
@@ -67,6 +88,12 @@ var LogonAction = /** @class */ (function (_super) {
         __metadata("design:paramtypes", []),
         __metadata("design:returntype", void 0)
     ], LogonAction.prototype, "Post", null);
+    __decorate([
+        decorators_1.Post('/create'),
+        __metadata("design:type", Function),
+        __metadata("design:paramtypes", []),
+        __metadata("design:returntype", void 0)
+    ], LogonAction.prototype, "Insert", null);
     return LogonAction;
 }(action_1.Action));
 exports.LogonAction = LogonAction;

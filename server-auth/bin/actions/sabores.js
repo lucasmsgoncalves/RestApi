@@ -33,10 +33,10 @@ var SaboresAction = /** @class */ (function (_super) {
         return _super !== null && _super.apply(this, arguments) || this;
     }
     SaboresAction.prototype.generateSQL = function (tamanho) {
-        return 'select sabores.sabor, st.idSabor ' +
+        return 'select sabores.sabor, st.idSabor, st.preco ' +
             'from sabores_has_tamanhos as st ' +
             'left join sabores on sabores.id = st.idSabor ' +
-            'where st.idTamanho =' + tamanho;
+            'where st.idTamanho = ' + tamanho;
     };
     SaboresAction.prototype.getSabores = function () {
         var _this = this;

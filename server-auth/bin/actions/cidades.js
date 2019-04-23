@@ -25,24 +25,22 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var decorators_1 = require("../decorators");
 var action_1 = require("../kernel/action");
 var route_types_1 = require("../kernel/route-types");
+var mysql_factory_1 = require("../mysql/mysql_factory");
 var CidadesAction = /** @class */ (function (_super) {
     __extends(CidadesAction, _super);
     function CidadesAction() {
         return _super !== null && _super.apply(this, arguments) || this;
     }
+    CidadesAction.prototype.generateSQL = function () {
+        return 'select id, name from cidades';
+    };
     CidadesAction.prototype.getCidades = function () {
-        var cidades = [];
-        cidades.push({
-            id: 1,
-            name: "Jaraguá do Sul"
-        }, {
-            id: 2,
-            name: "Corupá"
-        }, {
-            id: 3,
-            name: "Guaramirim"
+        var _this = this;
+        new mysql_factory_1.MySQLFactory().getConnection().select(this.generateSQL()).subscribe(function (data) {
+            _this.sendAnswer(data);
+        }, function (error) {
+            _this.sendError(error);
         });
-        this.sendAnswer(cidades);
     };
     CidadesAction.prototype.defineVisibility = function () {
         this.actionEscope = route_types_1.ActionType.atPublic;

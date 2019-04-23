@@ -18,11 +18,39 @@ export class LogonAction extends Action{
                + this.req.body.password + '\'';
     }
 
+    private insertSQL() : string {
+        return 'INSERT INTO users (idUser, userName, password) ' + 
+               'VALUES ("3,'+ this.req.body.userName + ',' + this.req.body.password + ')';
+    }
+
     @Post('/logon')
     public Post(){
         this.validateData();
 
         new MySQLFactory().getConnection().select(this.generateSQL()).subscribe(
+            (data : any) => {
+                if (!data.length || data.length != 1){
+                  this.sendError(new KernelUtils().createErrorApiObject(401, '1001', 'Usuário e senha inválidos'));
+                  return;
+                }
+                
+                this.sendAnswer({
+                    token    : new VPUtils().generateGUID().toUpperCase(),
+                    userName : this.req.body.userName,
+                    password : this.req.body.password
+                });
+            },
+            (error : any) => {
+                this.sendError(error);
+            }
+        );
+    }
+
+    @Post('/create')
+    public Insert(){
+        this.validateData();
+
+        new MySQLFactory().getConnection().select(this.insertSQL()).subscribe(
             (data : any) => {
                 if (!data.length || data.length != 1){
                   this.sendError(new KernelUtils().createErrorApiObject(401, '1001', 'Usuário e senha inválidos'));

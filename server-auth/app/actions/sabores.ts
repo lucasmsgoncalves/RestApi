@@ -7,10 +7,10 @@ import {MySQLFactory} from '../mysql/mysql_factory';
 export class SaboresAction extends Action {
 
     private generateSQL(tamanho : number) : string {
-        return 'select sabores.sabor, st.idSabor ' + 
+        return 'select sabores.sabor, st.idSabor, st.preco ' + 
                'from sabores_has_tamanhos as st ' +
                'left join sabores on sabores.id = st.idSabor ' +
-               'where st.idTamanho ='+ tamanho;
+               'where st.idTamanho = '+ tamanho;
     }
 
     @Get('/sabores/:tamanho')
