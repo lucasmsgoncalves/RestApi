@@ -18,9 +18,14 @@ export class LogonAction extends Action{
                + this.req.body.password + '\'';
     }
 
+    private validateUser() : string {
+        return 'select * from users where users.userName = \'' 
+               + this.req.body.userName +'\'';
+    }
+
     private insertSQL() : string {
-        return 'INSERT INTO users (idUser, userName, password) ' + 
-               'VALUES ("3,'+ this.req.body.userName + ',' + this.req.body.password + ')';
+        return 'INSERT INTO users (userName, password) ' + 
+               'VALUES (\'' + this.req.body.userName + '\',\'' + this.req.body.password + '\')';
     }
 
     @Post('/logon')
@@ -50,23 +55,27 @@ export class LogonAction extends Action{
     public Insert(){
         this.validateData();
 
-        new MySQLFactory().getConnection().select(this.insertSQL()).subscribe(
+        new MySQLFactory().getConnection().select(this.validateUser()).subscribe(
             (data : any) => {
-                if (!data.length || data.length != 1){
-                  this.sendError(new KernelUtils().createErrorApiObject(401, '1001', 'Usuário e senha inválidos'));
-                  return;
-                }
-                
-                this.sendAnswer({
-                    token    : new VPUtils().generateGUID().toUpperCase(),
-                    userName : this.req.body.userName,
-                    password : this.req.body.password
-                });
-            },
-            (error : any) => {
-                this.sendError(error);
+                 if (data.length && data.length > 0){
+                   this.sendError(new KernelUtils().createErrorApiObject(401, '1002', 'User already exists'));
+                   return;
+                 }      
+
+                 new MySQLFactory().getConnection().select(this.insertSQL()).subscribe(
+                    (data : any) => {
+                        this.sendAnswer({
+                            token    : new VPUtils().generateGUID().toUpperCase(),
+                            userName : this.req.body.userName,
+                            password : this.req.body.password
+                        });
+                    },
+                    (error : any) => {
+                        this.sendError(error);
+                    }
+                ); 
             }
-        );
+        )
     }
 
     defineVisibility() {

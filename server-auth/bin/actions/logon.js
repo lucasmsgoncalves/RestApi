@@ -41,9 +41,13 @@ var LogonAction = /** @class */ (function (_super) {
             + this.req.body.userName + '\' and users.password = \''
             + this.req.body.password + '\'';
     };
+    LogonAction.prototype.validateUser = function () {
+        return 'select * from users where users.userName = \''
+            + this.req.body.userName + '\'';
+    };
     LogonAction.prototype.insertSQL = function () {
-        return 'INSERT INTO users (idUser, userName, password) ' +
-            'VALUES (3,' + this.req.body.userName + ',' + this.req.body.password + ')';
+        return 'INSERT INTO users (userName, password) ' +
+            'VALUES (\'' + this.req.body.userName + '\',\'' + this.req.body.password + '\')';
     };
     LogonAction.prototype.Post = function () {
         var _this = this;
@@ -65,18 +69,20 @@ var LogonAction = /** @class */ (function (_super) {
     LogonAction.prototype.Insert = function () {
         var _this = this;
         this.validateData();
-        new mysql_factory_1.MySQLFactory().getConnection().select(this.insertSQL()).subscribe(function (data) {
-            if (!data.length || data.length != 1) {
-                _this.sendError(new kernel_utils_1.KernelUtils().createErrorApiObject(401, '1001', 'Usuário e senha inválidos'));
+        new mysql_factory_1.MySQLFactory().getConnection().select(this.validateUser()).subscribe(function (data) {
+            if (data.length && data.length > 0) {
+                _this.sendError(new kernel_utils_1.KernelUtils().createErrorApiObject(401, '1002', 'User already exists'));
                 return;
             }
-            _this.sendAnswer({
-                token: new vputils_1.VPUtils().generateGUID().toUpperCase(),
-                userName: _this.req.body.userName,
-                password: _this.req.body.password
+            new mysql_factory_1.MySQLFactory().getConnection().select(_this.insertSQL()).subscribe(function (data) {
+                _this.sendAnswer({
+                    token: new vputils_1.VPUtils().generateGUID().toUpperCase(),
+                    userName: _this.req.body.userName,
+                    password: _this.req.body.password
+                });
+            }, function (error) {
+                _this.sendError(error);
             });
-        }, function (error) {
-            _this.sendError(error);
         });
     };
     LogonAction.prototype.defineVisibility = function () {
